@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.file.mapper.FileMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO file_info (origin_name, store_name, file_path, ext, file_size,
+                               content_type, category, uploader_id, create_time,
+                               status, frozen, download_count)
+        VALUES (#{originName}, #{storeName}, #{filePath}, #{ext}, #{fileSize},
+                #{contentType}, #{category}, #{uploaderId}, #{createTime},
+                #{status}, #{frozen}, #{downloadCount})
+    </insert>
+
+    <select id="findById" resultType="com.ssm.file.entity.FileInfo">
+        SELECT id, origin_name, store_name, file_path, ext, file_size, content_type,
+               category, uploader_id, create_time, status, frozen, download_count
+        FROM file_info
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByUploaderId" resultType="com.ssm.file.entity.FileInfo">
+        SELECT id, origin_name, store_name, file_path, ext, file_size, content_type,
+               category, uploader_id, create_time, status, frozen, download_count
+        FROM file_info
+        WHERE uploader_id = #{uploaderId}
+          AND status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="updateFrozen">
+        UPDATE file_info SET frozen = #{frozen} WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE file_info SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <update id="incrementDownloadCount">
+        UPDATE file_info SET download_count = download_count + 1 WHERE id = #{id}
+    </update>
+</mapper>
