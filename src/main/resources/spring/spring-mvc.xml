@@ -25,5 +25,6 @@
     <!-- Servlet 3 标准上传解析；大小限制在 web.xml 的 multipart-config 中 -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
 
-    <!-- M2 再注册 WebMvcConfig / 拦截器 -->
+    <!-- 拦截器必须通过 WebMvcConfigurer#addInterceptors 注册，不在此使用 mvc:interceptors -->
+    <bean class="com.ssm.file.config.WebMvcConfig"/>
 </beans>
