@@ -17,4 +17,6 @@
 
     <import resource="spring-datasource.xml"/>
 
+    <!-- 开启注解 AOP，用于选做：下载日志切面 -->
+    <aop:aspectj-autoproxy/>
 </beans>
