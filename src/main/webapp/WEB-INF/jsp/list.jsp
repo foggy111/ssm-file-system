@@ -40,6 +40,9 @@
                         <th>分类</th>
                         <th>大小</th>
                         <th>上传时间</th>
+                        <th>状态</th>
+                        <th>下载次数</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -59,6 +62,28 @@
                                 </c:choose>
                             </td>
                             <td><fmt:formatDate value="${f.createTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${f.frozen == 1}"><span class="tag warn">已冻结</span></c:when>
+                                    <c:otherwise>可下载</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>${f.downloadCount}</td>
+                            <td class="actions">
+                                <a class="btn small ghost" href="${pageContext.request.contextPath}/files/download/${f.id}">下载</a>
+                                <form method="post" action="${pageContext.request.contextPath}/files/freeze/${f.id}">
+                                    <button class="btn small ghost" type="submit">
+                                        <c:choose>
+                                            <c:when test="${f.frozen == 1}">解冻</c:when>
+                                            <c:otherwise>冻结下载</c:otherwise>
+                                        </c:choose>
+                                    </button>
+                                </form>
+                                <form method="post" action="${pageContext.request.contextPath}/files/delete/${f.id}"
+                                      onsubmit="return confirm('确定逻辑删除该文件吗？');">
+                                    <button class="btn small danger" type="submit">删除</button>
+                                </form>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>

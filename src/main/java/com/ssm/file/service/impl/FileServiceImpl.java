@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,5 +93,53 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             return "保存失败，请稍后重试";
         }
+    }
+
+    @Override
+    public FileInfo findOwned(Integer fileId, Integer userId) {
+        if (fileId == null || userId == null) {
+            return null;
+        }
+        FileInfo info = fileMapper.findById(fileId);
+        if (info == null || info.getStatus() == null || info.getStatus() != 1) {
+            return null;
+        }
+        if (!userId.equals(info.getUploaderId())) {
+            return null;
+        }
+        return info;
+    }
+
+    @Override
+    public Path resolveDiskPath(FileInfo info) {
+        return storageService.resolve(info.getFilePath());
+    }
+
+    @Override
+    @Transactional
+    public void toggleFrozen(Integer fileId, Integer userId) {
+        FileInfo info = findOwned(fileId, userId);
+        if (info == null) {
+            throw new IllegalArgumentException("无权操作该文件");
+        }
+        int next = (info.getFrozen() != null && info.getFrozen() == 1) ? 0 : 1;
+        fileMapper.updateFrozen(fileId, next);
+    }
+
+    @Override
+    @Transactional
+    public void logicalDelete(Integer fileId, Integer userId) {
+        FileInfo info = findOwned(fileId, userId);
+        if (info == null) {
+            throw new IllegalArgumentException("无权操作该文件");
+        }
+        fileMapper.updateStatus(fileId, 0);
+    }
+
+    @Override
+    @Transactional
+    public void recordDownload(Integer fileId, Integer downloaderId) {
+        fileMapper.incrementDownloadCount(fileId);
+        // 下载日志由 DownloadLogAspect 在本方法成功返回后写入
     }
 }
